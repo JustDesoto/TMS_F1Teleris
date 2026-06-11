@@ -1,5 +1,9 @@
 
-![Status](https://img.shields.io/badge/status-active-success.svg) ![GitHub last commit](https://img.shields.io/github/last-commit/JustDesoto/TMS_F1Teleris)
+![GitHub last commit](https://img.shields.io/github/last-commit/JustDesoto/TMS_F1Teleris)
+![Status](https://img.shields.io/badge/status-active-success.svg)
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+
+
 # 🏎️ F1 Teleris — Formula 1 Data Pipeline
 
 
