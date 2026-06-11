@@ -1,13 +1,13 @@
 
-![GitHub last commit](https://img.shields.io/github/last-commit/JustDesoto/TMS_F1Teleris)
-![Status](https://img.shields.io/badge/status-active-success.svg)
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
+
 
 
 # 🏎️ F1 Teleris — Formula 1 Data Pipeline
 
 
-
+![GitHub last commit](https://img.shields.io/github/last-commit/JustDesoto/TMS_F1Teleris)
+![Status](https://img.shields.io/badge/status-active-success.svg)
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
 
 ![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)
 ![Apache Airflow](https://img.shields.io/badge/Airflow-2.8.1-green.svg)
@@ -20,7 +20,8 @@
 
 **F1 Teleris** — production-ready data pipeline для сбора, трансформации и анализа данных Formula 1 из OpenF1 API с использованием Airflow, MongoDB, PostgreSQL, ClickHouse и Superset.
 
----
+[![Star on GitHub](https://img.shields.io/github/stars/JustDesoto/TMS_F1Teleris.svg?style=social)](https://github.com/JustDesoto/TMS_F1Teleris/stargazers)
+
 
 ## 📋 Оглавление
 
@@ -226,7 +227,7 @@ TMS_F1Teleris/
 ├── init/                       # Инициализация БД
 │   ├── init-mongo.js
 │   ├── init-postgres.sql
-│   └── init-clickhouse.sh
+│   ├── init-clickhouse.sh
 │   └── init-superset.sh
 │
 ├── superset/                   # Дашборды Superset
