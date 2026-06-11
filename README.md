@@ -1,5 +1,13 @@
 
+
+
+
 # 🏎️ F1 Teleris — Formula 1 Data Pipeline
+
+
+![GitHub last commit](https://img.shields.io/github/last-commit/JustDesoto/TMS_F1Teleris)
+![Status](https://img.shields.io/badge/status-active-success.svg)
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
 
 ![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)
 ![Apache Airflow](https://img.shields.io/badge/Airflow-2.8.1-green.svg)
@@ -12,23 +20,21 @@
 
 **F1 Teleris** — production-ready data pipeline для сбора, трансформации и анализа данных Formula 1 из OpenF1 API с использованием Airflow, MongoDB, PostgreSQL, ClickHouse и Superset.
 
----
+## Оглавление
 
-## 📋 Оглавление
-
-- [Quick Start](#-quick-start)
-- [Архитектура](#️-архитектура)
-- [Структура репозитория](#️-структура-репозитория)
-- [Технологический стек](#️-технологический-стек)
-- [Модель данных](#️-модель-данных)
-- [ETL Pipeline](#-etl-pipeline)
-- [Мониторинг и качество данных](#-мониторинг-и-качество-данных)
-- [API Endpoints](#-api-endpoints)
-- [Галерея](#-галерея)
+- [Quick Start](#quick-start)
+- [Архитектура](#архитектура)
+- [Структура репозитория](#структура-репозитория)
+- [Технологический стек](#технологический-стек)
+- [Модель данных](#модель-данных)
+- [ETL Pipeline](#etl-pipeline)
+- [Мониторинг и качество данных](#мониторинг-и-качество-данных)
+- [API Endpoints](#api-endpoints)
+- [Галерея](#галерея)
 
 ---
 
-## ⚡ Quick Start
+## Quick Start
 
 ### 1. Клонирование репозитория
 
@@ -77,7 +83,7 @@ docker-compose down -v  # Остановка с удалением томов (�
 
 ---
 
-## 🏗️ Архитектура
+## Архитектура
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────┐
@@ -90,8 +96,8 @@ docker-compose down -v  # Остановка с удалением томов (�
 │  Extractors Layer                                                        │
 │  ┌─────────────────────┐    ┌─────────────────────────────────────────┐  │
 │  │  OpenF1Extractor    │    │ ExtractOrchestrator                     │  │
-│  │  (HTTP client)      │    │  • Управление процессом извлечения      │  │
-│  └─────────────────────┘    │  • Batch processing (10k записей)       │  │
+│  │                     │    │  • Управление процессом извлечения      │  │
+│  └─────────────────────┘    │  • Batch processing                     │  │
 │                             └─────────────────────────────────────────┘  │
 └──────────────────────────────────────────────────────────────────────────┘
                                       │
@@ -126,18 +132,18 @@ docker-compose down -v  # Остановка с удалением томов (�
                                       │
               ┌───────────────────────┴───────────────────────┐
               ▼                                               ▼
-┌─────────────────────────┐                   ┌─────────────────────────┐
-│   PostgreSQL (DDS)      │                   │   ClickHouse (OLAP)     │
-│  ┌───────────────────┐  │                   │  ┌───────────────────┐  │
-│  │ dim_session       │  │                   │  │ fact_car_data     │  │
-│  │ dim_meeting_*     │  │                   │  │ fact_position     │  │
-│  │ dim_driver_*      │  │                   │  │ fact_lap          │  │
-│  │ fact_starting_grid│  │                   │  │ fact_pit_stop     │  │
-│  │ fact_session_result│ │                   │  │ fact_weather      │  │
-│  └───────────────────┘  │                   │  │ fact_overtake     │  │
-│  • SCD Type 0           │                   │  │ fact_stint        │  │
-│  • ON CONFLICT DO NO... │                   │  │ fact_location     │  │
-└─────────────────────────┘                   └─────────────────────────┘
+┌─────────────────────────┐                      ┌─────────────────────────┐
+│   PostgreSQL (DDS)      │                      │   ClickHouse (OLAP)     │
+│  ┌───────────────────┐  │                      │  ┌───────────────────┐  │
+│  │ dim_session       │  │                      │  │ fact_car_data     │  │
+│  │ dim_meeting_*     │  │                      │  │ fact_position     │  │
+│  │ dim_driver_*      │  │                      │  │ fact_lap          │  │
+│  │ fact_starting_grid│  │                      │  │ fact_pit_stop     │  │
+│  │ fact_session_result│ │                      │  │ fact_weather      │  │
+│  └───────────────────┘  │                      │  │ fact_overtake     │  │
+│  • SCD Type 0           │                      │  │ fact_stint        │  │
+│  • ON CONFLICT DO NO... │                      │  │ fact_location     │  │
+└─────────────────────────┘                      └─────────────────────────┘
               │                                               │
               └───────────────────┬───────────────────────────┘
                                   ▼
@@ -151,7 +157,7 @@ docker-compose down -v  # Остановка с удалением томов (�
 
 ---
 
-## 🗂️ Структура репозитория
+## Структура репозитория
 
 ```text
 TMS_F1Teleris/
@@ -159,7 +165,7 @@ TMS_F1Teleris/
 │   └── dags/
 │       ├── f1_etl_manual.py           # Ручной запуск ETL
 │       ├── f1_etl_future.py           # Автоматический ETL для будущих сессий
-│       ├── f1_etl_test.py             # Тест подключений
+│       └── f1_etl_test.py             # Тест подключений
 │
 ├── extractors/                 # Извлечение данных из API
 │   ├── openf1_extractor.py     # Клиент OpenF1 API
@@ -218,7 +224,7 @@ TMS_F1Teleris/
 ├── init/                       # Инициализация БД
 │   ├── init-mongo.js
 │   ├── init-postgres.sql
-│   └── init-clickhouse.sh
+│   ├── init-clickhouse.sh
 │   └── init-superset.sh
 │
 ├── superset/                   # Дашборды Superset
@@ -232,7 +238,7 @@ TMS_F1Teleris/
 
 ---
 
-## 🛠️ Технологический стек
+## Технологический стек
 
 | Компонент | Технология | Версия |
 |-----------|-----------|--------|
@@ -251,7 +257,7 @@ TMS_F1Teleris/
 
 ---
 
-## 🗄️ Модель данных
+## Модель данных
 
 ### PostgreSQL (DDS — измерения)
 
@@ -280,7 +286,7 @@ TMS_F1Teleris/
 
 ---
 
-## 🔄 ETL Pipeline
+## ETL Pipeline
 
 ### Типы DAG-ов
 
@@ -331,7 +337,7 @@ CREATE TABLE etl_session_queue (
 
 ---
 
-## 📊 Мониторинг и качество данных
+## Мониторинг и качество данных
 
 ### Дедупликация
 - Каждый документ в MongoDB имеет `etl_hash` (SHA256)
@@ -364,7 +370,7 @@ airflow_webserver:
 
 ---
 
-## 🔌 API Endpoints
+## API Endpoints
 
 ### OpenF1 API (используемые эндпоинты)
 
@@ -387,9 +393,7 @@ airflow_webserver:
 
 ---
 
-## 🧪 Галерея
-
-##№ 📊 Дашборды Superset
+## Галерея
 
 ![Race Dashboard](docs/images/Dashboard_1.png)
 
@@ -397,16 +401,26 @@ airflow_webserver:
 
 ![Team Performance](docs/images/Dashboard_3.png)
 
+![Dag](docs/images/Dag_1.png)
+
+
 ---
 
-## 👨‍💻 Автор
+## Автор
 
 **Горностай Анатолий**  
 GitHub: [@JustDesoto](https://github.com/JustDesoto)
 
 ---
 
-## 📄 Лицензия
+## Благодарности
+
+- [OpenF1](https://openf1.org/) за бесплатный API
+- Сообществу Apache Airflow, Superset и ClickHouse
+
+---
+
+## Лицензия
 
 MIT License
 
