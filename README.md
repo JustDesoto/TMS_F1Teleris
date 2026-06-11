@@ -1,5 +1,9 @@
 
+![Status](https://img.shields.io/badge/status-active-success.svg) ![GitHub last commit](https://img.shields.io/github/last-commit/JustDesoto/TMS_F1Teleris)
 # 🏎️ F1 Teleris — Formula 1 Data Pipeline
+
+
+
 
 ![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)
 ![Apache Airflow](https://img.shields.io/badge/Airflow-2.8.1-green.svg)
@@ -389,13 +393,14 @@ airflow_webserver:
 
 ## 🧪 Галерея
 
-##№ 📊 Дашборды Superset
-
 ![Race Dashboard](docs/images/Dashboard_1.png)
 
 ![Driver Analytics](docs/images/Dashboard_2.png)
 
 ![Team Performance](docs/images/Dashboard_3.png)
+
+![Dag](docs/images/Dag_1.png)
+
 
 ---
 
@@ -403,6 +408,13 @@ airflow_webserver:
 
 **Горностай Анатолий**  
 GitHub: [@JustDesoto](https://github.com/JustDesoto)
+
+---
+
+## 🙏 Благодарности
+
+- [OpenF1](https://openf1.org/) за бесплатный API
+- Сообществу Apache Airflow, Superset и ClickHouse
 
 ---
 
