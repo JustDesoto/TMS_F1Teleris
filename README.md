@@ -73,7 +73,9 @@ docker exec f1_airflow_webserver airflow dags trigger f1_etl_test
 # Ручной запуск для конкретной сессии
 docker exec f1_airflow_webserver airflow dags trigger -c '{"session_key": 11280}' f1_etl_manual
 ```
-Также запустить DAG можно через Web UI Airflow (http://localhost:8080, admin/admin) — выберите DAG и нажмите кнопку **Trigger DAG**, для `f1_etl_manual` дополнительно укажите конфиг `{"session_key": 11280}`.
+Также запустить DAG можно через Web UI Airflow (http://localhost:8080) — выберите DAG и нажмите кнопку **Trigger DAG**, для `f1_etl_manual` дополнительно укажите конфиг `{"session_key": 11280}`.
+
+Готовые дашборды вы можете импортировать в **Superset** (http://localhost:8088). Для этого откройте веб-интерфейс Superset, авторизуйтесь с логином `admin` и паролем `admin123`, затем перейдите в **Settings** → **Import Dashboards** и выберите ZIP архив с дашбордами из папки `superset/dashboards/`.
 
 ### 5. Остановка
 
