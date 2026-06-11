@@ -86,7 +86,7 @@ docker exec f1_airflow_webserver airflow dags unpause f1_etl_future
 ### 5. Остановка
 
 ```bash
-docker-compose down -v  # Остановка с удалением томов (чистый старт)
+docker-compose down -v
 ```
 
 ---
