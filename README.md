@@ -71,7 +71,7 @@ docker-compose up -d
 docker exec f1_airflow_webserver airflow dags trigger f1_etl_test
 
 # Ручной запуск для конкретной сессии
-docker exec f1_airflow_webserver airflow dags trigger -c '{"session_key": 11280}' f1_etl_manual
+docker exec f1_airflow_webserver airflow dags trigger -c '{\"session_key\": 11280}' f1_etl_manual
 ```
 Также запустить DAG можно через Web UI Airflow (http://localhost:8080) — выберите DAG и нажмите кнопку **Trigger DAG**, для `f1_etl_manual` дополнительно укажите конфиг `{"session_key": 11280}`.
 
