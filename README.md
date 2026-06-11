@@ -165,7 +165,7 @@ TMS_F1Teleris/
 │   └── dags/
 │       ├── f1_etl_manual.py           # Ручной запуск ETL
 │       ├── f1_etl_future.py           # Автоматический ETL для будущих сессий
-│       ├── f1_etl_test.py             # Тест подключений
+│       └── f1_etl_test.py             # Тест подключений
 │
 ├── extractors/                 # Извлечение данных из API
 │   ├── openf1_extractor.py     # Клиент OpenF1 API
