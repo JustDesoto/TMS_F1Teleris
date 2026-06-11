@@ -1,7 +1,7 @@
-# docker-compose.yml
-version: '3.8'
-
 services:
+  # ============================================
+  # MongoDB
+  # ============================================
   mongodb:
     image: mongo:7.0
     container_name: f1_mongodb
@@ -9,13 +9,13 @@ services:
     ports:
       - "27017:27017"
     environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: f1password123
-      MONGO_INITDB_DATABASE: f1_pipeline
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD:-f1password123}
+      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE:-f1_pipeline}
     volumes:
       - mongodb_data:/data/db
       - mongodb_config:/data/configdb
-      - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+      - ./init/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
     networks:
       - f1_network
     healthcheck:
@@ -25,10 +25,278 @@ services:
       retries: 5
       start_period: 10s
 
+  # ============================================
+  # PostgreSQL
+  # ============================================
+  postgres:
+    image: postgres:15
+    container_name: f1_postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-f1_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-f1_password}
+      POSTGRES_DB: ${POSTGRES_DB:-f1_dds}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init/init-postgres.sql:/docker-entrypoint-initdb.d/init-postgres.sql:ro
+    networks:
+      - f1_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-f1_user} -d ${POSTGRES_DB:-f1_dds}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
+  # ============================================
+  # PostgreSQL
+  # ============================================
+  airflow_postgres:
+    image: postgres:15
+    container_name: f1_airflow_postgres
+    restart: unless-stopped
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: airflow
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+    volumes:
+      - airflow_postgres_data:/var/lib/postgresql/data
+    networks:
+      - f1_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U airflow -d airflow"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # ============================================
+  # ClickHouse
+  # ============================================
+  clickhouse:
+    image: clickhouse/clickhouse-server:23.8
+    container_name: f1_clickhouse
+    restart: unless-stopped
+    ports:
+      - "8123:8123"
+      - "9000:9000"
+      - "9009:9009"
+    environment:
+      CLICKHOUSE_DB: ${CLICKHOUSE_DB:-f1_analytics}
+      CLICKHOUSE_USER: ${CLICKHOUSE_USER:-default}
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:-}
+    volumes:
+      - clickhouse_data:/var/lib/clickhouse
+      - clickhouse_logs:/var/log/clickhouse-server
+      - ./init/init-clickhouse.sh:/docker-entrypoint-initdb.d/init-clickhouse.sh:ro
+    networks:
+      - f1_network
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8123/ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # ============================================
+  # Apache Superset
+  # ============================================
+  superset:
+    image: apache/superset:3.1.0
+    container_name: f1_superset
+    restart: unless-stopped
+    ports:
+      - "8088:8088"
+    env_file:
+      - .env
+    environment:
+      SUPERSET_SECRET_KEY: ${SUPERSET_SECRET_KEY:-f1_superset_secret_key_2024}
+      SUPERSET_LOAD_EXAMPLES: no
+    volumes:
+      - superset_data:/app/superset_home
+      - ./init/init-superset.sh:/docker-entrypoint-initdb.d/init-superset.sh:ro
+      - ./superset/dashboards:/app/superset_home/dashboards:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - f1_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8088/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    command: >
+      sh -c "
+        pip install --trusted-host pypi.org --trusted-host files.pythonhosted.org clickhouse-driver clickhouse-connect &&
+        echo '=== Waiting for Superset to be ready ===' &&
+        sleep 20 &&
+        echo '=== Running Superset init script ===' &&
+        bash /docker-entrypoint-initdb.d/init-superset.sh 2>/dev/null || true &&
+        echo '=== Starting Superset server ===' &&
+        superset run -h 0.0.0.0 -p 8088 --with-threads --reload --debugger
+      "
+
+  # ============================================
+  # Airflow Init
+  # ============================================
+  airflow_init:
+    image: apache/airflow:2.8.1-python3.10
+    container_name: f1_airflow_init
+    env_file:
+      - .env
+    environment:
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@airflow_postgres/airflow
+      AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+    volumes:
+      - ./orchestrators/dags:/opt/airflow/dags
+      - ./orchestrators/logs:/opt/airflow/logs
+      - ./orchestrators/plugins:/opt/airflow/plugins
+      - ./requirements.txt:/requirements.txt
+      - ./config:/opt/airflow/config
+      - ./extractors:/opt/airflow/extractors
+      - ./transformers:/opt/airflow/transformers
+      - ./loaders:/opt/airflow/loaders
+      - ./repositories:/opt/airflow/repositories
+    command: >
+      bash -c "
+        pip install --trusted-host pypi.org --trusted-host files.pythonhosted.org -r /requirements.txt &&
+        airflow db init
+      "
+    depends_on:
+      airflow_postgres:
+        condition: service_healthy
+    networks:
+      - f1_network
+    restart: "no"
+
+  # ============================================
+  # Airflow Create User
+  # ============================================
+  airflow_create_user:
+    image: apache/airflow:2.8.1-python3.10
+    container_name: f1_airflow_create_user
+    env_file:
+      - .env
+    environment:
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@airflow_postgres/airflow
+      AIRFLOW_USER: ${AIRFLOW_USER:-admin}
+      AIRFLOW_PASSWORD: ${AIRFLOW_PASSWORD:-admin}
+    volumes:
+      - ./orchestrators/dags:/opt/airflow/dags
+      - ./orchestrators/logs:/opt/airflow/logs
+      - ./orchestrators/plugins:/opt/airflow/plugins
+      - ./config:/opt/airflow/config
+      - ./extractors:/opt/airflow/extractors
+      - ./transformers:/opt/airflow/transformers
+      - ./loaders:/opt/airflow/loaders
+      - ./repositories:/opt/airflow/repositories
+    command: bash -c "airflow users create --username $$AIRFLOW_USER --firstname Admin --lastname User --role Admin --email admin@f1.com --password $$AIRFLOW_PASSWORD || echo 'User $$AIRFLOW_USER already exists'"
+    depends_on:
+      airflow_init:
+        condition: service_completed_successfully
+    networks:
+      - f1_network
+    restart: "no"
+
+  # ============================================
+  # Airflow Webserver
+  # ============================================
+  airflow_webserver:
+    image: apache/airflow:2.8.1-python3.10
+    container_name: f1_airflow_webserver
+    ports:
+      - "8080:8080"
+    environment:
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@airflow_postgres/airflow
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+      AIRFLOW__WEBSERVER__DEFAULT_UI_TIMEZONE: 'UTC'
+    volumes:
+      - ./orchestrators/dags:/opt/airflow/dags
+      - ./orchestrators/logs:/opt/airflow/logs
+      - ./orchestrators/plugins:/opt/airflow/plugins
+      - ./requirements.txt:/requirements.txt
+      - ./config:/opt/airflow/config
+      - ./extractors:/opt/airflow/extractors
+      - ./transformers:/opt/airflow/transformers
+      - ./loaders:/opt/airflow/loaders
+      - ./repositories:/opt/airflow/repositories
+      - ./.env:/opt/airflow/.env
+    command: >
+      bash -c "
+        export PYTHONPATH=/opt/airflow:$PYTHONPATH &&
+        pip install --trusted-host pypi.org --trusted-host files.pythonhosted.org -r /requirements.txt &&
+        airflow webserver
+      "
+    depends_on:
+      airflow_create_user:
+        condition: service_completed_successfully
+    networks:
+      - f1_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  # ============================================
+  # Airflow Scheduler
+  # ============================================
+  airflow_scheduler:
+    image: apache/airflow:2.8.1-python3.10
+    container_name: f1_airflow_scheduler
+    environment:
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@airflow_postgres/airflow
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+      AIRFLOW__SCHEDULER__SCHEDULER_HEARTBEAT_SEC: '30'
+      AIRFLOW__SCHEDULER__JOB_HEARTBEAT_SEC: '30'
+      AIRFLOW__CORE__KILLED_TASK_CLEANUP_TIME: '60'
+    volumes:
+      - ./orchestrators/dags:/opt/airflow/dags
+      - ./orchestrators/logs:/opt/airflow/logs
+      - ./orchestrators/plugins:/opt/airflow/plugins
+      - ./requirements.txt:/requirements.txt
+      - ./config:/opt/airflow/config
+      - ./extractors:/opt/airflow/extractors
+      - ./transformers:/opt/airflow/transformers
+      - ./loaders:/opt/airflow/loaders
+      - ./repositories:/opt/airflow/repositories
+      - ./.env:/opt/airflow/.env
+    command: >
+      bash -c "
+        export PYTHONPATH=/opt/airflow:$PYTHONPATH &&
+        pip install --trusted-host pypi.org --trusted-host files.pythonhosted.org -r /requirements.txt &&
+        airflow scheduler
+      "
+    depends_on:
+      airflow_create_user:
+        condition: service_completed_successfully
+    networks:
+      - f1_network
+    restart: unless-stopped
 
 volumes:
   mongodb_data:
-    driver: local
   mongodb_config:
-    driver: local
+  postgres_data:
+  clickhouse_data:
+  clickhouse_logs:
+  superset_data:
+  airflow_postgres_data:
+
+networks:
+  f1_network:
+    driver: bridge
