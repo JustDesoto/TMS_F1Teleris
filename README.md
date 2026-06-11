@@ -132,18 +132,18 @@ docker-compose down -v  # Остановка с удалением томов (�
                                       │
               ┌───────────────────────┴───────────────────────┐
               ▼                                               ▼
-┌─────────────────────────┐                   ┌─────────────────────────┐
-│   PostgreSQL (DDS)      │                   │   ClickHouse (OLAP)     │
-│  ┌───────────────────┐  │                   │  ┌───────────────────┐  │
-│  │ dim_session       │  │                   │  │ fact_car_data     │  │
-│  │ dim_meeting_*     │  │                   │  │ fact_position     │  │
-│  │ dim_driver_*      │  │                   │  │ fact_lap          │  │
-│  │ fact_starting_grid│  │                   │  │ fact_pit_stop     │  │
-│  │ fact_session_result│ │                   │  │ fact_weather      │  │
-│  └───────────────────┘  │                   │  │ fact_overtake     │  │
-│  • SCD Type 0           │                   │  │ fact_stint        │  │
-│  • ON CONFLICT DO NO... │                   │  │ fact_location     │  │
-└─────────────────────────┘                   └─────────────────────────┘
+┌─────────────────────────┐                      ┌─────────────────────────┐
+│   PostgreSQL (DDS)      │                      │   ClickHouse (OLAP)     │
+│  ┌───────────────────┐  │                      │  ┌───────────────────┐  │
+│  │ dim_session       │  │                      │  │ fact_car_data     │  │
+│  │ dim_meeting_*     │  │                      │  │ fact_position     │  │
+│  │ dim_driver_*      │  │                      │  │ fact_lap          │  │
+│  │ fact_starting_grid│  │                      │  │ fact_pit_stop     │  │
+│  │ fact_session_result│ │                      │  │ fact_weather      │  │
+│  └───────────────────┘  │                      │  │ fact_overtake     │  │
+│  • SCD Type 0           │                      │  │ fact_stint        │  │
+│  • ON CONFLICT DO NO... │                      │  │ fact_location     │  │
+└─────────────────────────┘                      └─────────────────────────┘
               │                                               │
               └───────────────────┬───────────────────────────┘
                                   ▼
