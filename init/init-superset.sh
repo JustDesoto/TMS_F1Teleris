@@ -7,8 +7,6 @@ echo "============================================================"
 echo "Superset Initialization"
 echo "============================================================"
 
-# Ждем пока Superset запустится
-sleep 15
 
 echo "Creating admin user: ${SUPERSET_ADMIN_USERNAME:-admin}..."
 superset fab create-admin \
