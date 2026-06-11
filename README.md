@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-This project is a thesis on TMS courses
-s`
-=======
 
 # 🏎️ F1 Teleris — Formula 1 Data Pipeline
 
@@ -417,4 +413,3 @@ MIT License
 ---
 
 **Built with ❤️ for Formula 1 and Data Engineering**
->>>>>>> 3e2fb4be98b76cfd79ea34b9f67c32a24a47a1c9
