@@ -20,9 +20,6 @@
 
 **F1 Teleris** — production-ready data pipeline для сбора, трансформации и анализа данных Formula 1 из OpenF1 API с использованием Airflow, MongoDB, PostgreSQL, ClickHouse и Superset.
 
-[![Star on GitHub](https://img.shields.io/github/stars/JustDesoto/TMS_F1Teleris.svg?style=social)](https://github.com/JustDesoto/TMS_F1Teleris/stargazers)
-
-
 ## Оглавление
 
 - [Quick Start](#quick-start)
