@@ -393,7 +393,7 @@ airflow_webserver:
 | `/v1/weather` | `weather` | Погодные условия |
 | `/v1/race_control` | `race_control` | События гонки (SC, флаги) |
 | `/v1/overtakes` | `overtakes` | Обгоны |
-| `/v1/stints` | `stints` | Стенты шин |
+| `/v1/stints` | `stints` | Состояние шин |
 | `/v1/location` | `location` | GPS координаты |
 | `/v1/starting_grid` | `starting_grid` | Стартовая решетка |
 | `/v1/session_result` | `session_result` | Результаты сессии |
