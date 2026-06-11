@@ -24,7 +24,7 @@
 - [ETL Pipeline](#-etl-pipeline)
 - [Мониторинг и качество данных](#-мониторинг-и-качество-данных)
 - [API Endpoints](#-api-endpoints)
-- [Разработка](#-разработка)
+- [Галерея](#-галерея)
 
 ---
 
@@ -387,39 +387,15 @@ airflow_webserver:
 
 ---
 
-## 🧪 Разработка
+## 🧪 Галерея
 
-### Добавление нового трансформера
+##№ 📊 Дашборды Superset
 
-1. Создать класс в `transformers/fact/` или `transformers/dds/`
-2. Унаследоваться от `BaseTransformer`
-3. Реализовать методы `transform()`, `get_target_database()`, `get_table_name()`
-4. Добавить вызов в `DDSTransformer` и `DDSTransformOrchestrator`
+![Race Dashboard](docs/images/Dashboard_1.png)
 
-### Переменные окружения (.env)
+![Driver Analytics](docs/images/Dashboard_2.png)
 
-```env
-# MongoDB
-MONGO_INITDB_ROOT_USERNAME=admin
-MONGO_INITDB_ROOT_PASSWORD=f1password123
-MONGO_INITDB_DATABASE=f1_pipeline
-
-# PostgreSQL
-POSTGRES_USER=f1_user
-POSTGRES_PASSWORD=f1_password
-POSTGRES_DB=f1_dds
-
-# ClickHouse
-CLICKHOUSE_DB=f1_analytics
-CLICKHOUSE_USER=default
-
-# Airflow
-AIRFLOW_USER=admin
-AIRFLOW_PASSWORD=admin
-
-# Superset
-SUPERSET_SECRET_KEY=f1_superset_secret_key_2024
-```
+![Team Performance](docs/images/Dashboard_3.png)
 
 ---
 
