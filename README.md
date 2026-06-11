@@ -56,13 +56,13 @@ cp .env.example .env
 docker-compose up -d
 ```
 
-Это поднимет 8 сервисов:
+Это поднимет 10 сервисов:
 - MongoDB (raw data)
 - PostgreSQL (DDS слой)
 - PostgreSQL (метабаза Airflow)
 - ClickHouse (OLAP слой)
-- Apache Superset (BI)
-- Airflow Webserver + Scheduler + Init
+- Apache Superset (BI) + Init
+- Airflow Webserver + Scheduler + Init + CreateUser
 
 ### 4. Запуск ETL пайплайна
 
