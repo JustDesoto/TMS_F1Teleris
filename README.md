@@ -85,7 +85,7 @@ docker exec f1_airflow_webserver airflow dags unpause f1_etl_future
 - Все гонки 2026 года: https://api.openf1.org/v1/sessions?session_type=Race&year=2026
 - Все квалификации 2026 года: https://api.openf1.org/v1/sessions?session_type=Qualifying&year=2026
 
-Готовые дашборды вы можете импортировать в **Superset** (http://localhost:8088). Для этого откройте веб-интерфейс Superset, авторизуйтесь с логином `admin` и паролем `admin123`, затем перейдите в **Settings** → **Import Dashboards** и выберите ZIP архив с дашбордами из папки `superset/dashboards/`.
+Готовые дашборды вы можете импортировать в **Superset** (http://localhost:8088). Для этого откройте веб-интерфейс Superset, авторизуйтесь, затем перейдите в **Settings** → **Import Dashboards** и выберите ZIP архив с дашбордами из папки `superset/dashboards/`.
 
 ### 5. Остановка
 
@@ -295,6 +295,14 @@ TMS_F1Teleris/
 | `fact_overtake` | `OvertakeTransformer` | driver + session | — |
 | `fact_stint` | `StintTransformer` | driver + session | `total_laps`, `is_wet_tyre`, `is_soft/medium/hard` |
 | `fact_location` | `LocationTransformer` | driver + session | — |
+
+### PostgreSQL — Materialized Views
+
+| Материализованное представление | Описание | Ключевая логика |
+|-------------------------------|----------|-----------------|
+| `gold_race_analytics_mv` | Аналитика гонок и спринтов | Объединяет `fact_session_result`, `dim_driver_session`, `dim_session`. Вычисляет очки (F1 система 25-18-15-... для Race, 8-7-6-... для Sprint), флаги победителя/подиума/очковой финиша |
+| `gold_qualifying_analytics_mv` | Аналитика квалификаций | Включает времена Q1/Q2/Q3, участие в сегментах, стартовую позицию из `fact_starting_grid`, лучшее квалификационное время |
+| `gold_driver_championship_mv` | Чемпионат пилотов | Агрегация по году: победы, подиумы, очки (раздельно Race/Sprint и суммарно), средняя позиция финиша, процент DNF |
 
 ---
 
