@@ -71,7 +71,7 @@ docker-compose up -d
 # Ручной запуск
 # Активировать DAG
 docker exec f1_airflow_webserver airflow dags unpause f1_etl_manual
-# Ручной запуск для конкретной сессии
+# Ручной запуск для конкретной сессии (например 11280)
 docker exec f1_airflow_webserver airflow dags trigger -c '{\"session_key\": 11280}' f1_etl_manual
 
 # Автоматический запуск по следующим сессиям
@@ -79,7 +79,11 @@ docker exec f1_airflow_webserver airflow dags trigger -c '{\"session_key\": 1128
 docker exec f1_airflow_webserver airflow dags unpause f1_etl_future
 
 ```
-Также запустить DAG можно через Web UI Airflow (http://localhost:8080) — выберите DAG и нажмите кнопку **Trigger DAG**, для `f1_etl_manual` дополнительно укажите конфиг `{"session_key": 11280}`.
+Также запустить DAG можно через Web UI Airflow (http://localhost:8080) — выберите DAG и нажмите кнопку **Trigger DAG**, для `f1_etl_manual` дополнительно укажите конфиг, например `{"session_key": 11280}`.
+
+Вручную session_key можно получить через:
+- Все гонки 2026 года: https://api.openf1.org/v1/sessions?session_type=Race&year=2026
+- Все квалификации 2026 года: https://api.openf1.org/v1/sessions?session_type=Qualifying&year=2026
 
 Готовые дашборды вы можете импортировать в **Superset** (http://localhost:8088). Для этого откройте веб-интерфейс Superset, авторизуйтесь с логином `admin` и паролем `admin123`, затем перейдите в **Settings** → **Import Dashboards** и выберите ZIP архив с дашбордами из папки `superset/dashboards/`.
 
